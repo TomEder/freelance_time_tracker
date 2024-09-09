@@ -25,8 +25,6 @@ const Project = () => {
 
   const updateProjectTime = async (timeElapsed) => {
     if (project) {
-      const currentTime = new Date();
-
       // Calculate elapsed time in hours and round to the nearest half-hour (e.g., 0.5, 1.0, 1.5, etc.)
       const elapsedHours = Math.round((timeElapsed / 3600) * 2) / 2; // Rounds to nearest half-hour
 
