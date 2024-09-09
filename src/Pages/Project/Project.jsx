@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate for navigation
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
+import { auth } from "../../firebase"; // Import authentication
 import ProjectHeader from "./ProjectHeader/ProjectHeader";
 import ProjectData from "./ProjectData/ProjectData";
 
 const Project = () => {
   const { id } = useParams(); // Get project ID from URL
   const [project, setProject] = useState(null);
+  const navigate = useNavigate(); // Hook to programmatically navigate
   const db = getFirestore();
 
   useEffect(() => {
-    const fetchProject = async () => {
-      const projectDoc = doc(db, "projects", id);
+    const checkAuthAndFetchProject = async () => {
+      // Check if user is logged in
+      const currentUser = auth.currentUser;
+      if (!currentUser) {
+        console.error("No user is logged in.");
+        navigate("/"); // Redirect to login if not authenticated
+        return;
+      }
+
+      // Fetch project under the user's collection
+      const projectDoc = doc(db, `users/${currentUser.uid}/projects`, id);
       const projectSnap = await getDoc(projectDoc);
       if (projectSnap.exists()) {
         setProject(projectSnap.data());
@@ -20,8 +31,8 @@ const Project = () => {
       }
     };
 
-    fetchProject();
-  }, [id, db]);
+    checkAuthAndFetchProject();
+  }, [id, db, navigate]);
 
   const updateProjectTime = async (timeElapsed) => {
     if (project) {
@@ -47,7 +58,7 @@ const Project = () => {
       // Update the billing period in the array
       billingPeriods[billingPeriods.length - 1] = lastBillingPeriod;
 
-      const projectRef = doc(db, "projects", id);
+      const projectRef = doc(db, `users/${auth.currentUser.uid}/projects`, id);
       await updateDoc(projectRef, {
         hours: project.hours + elapsedHours, // Add the rounded hours to the total hours
         lastSession: newLastSession,

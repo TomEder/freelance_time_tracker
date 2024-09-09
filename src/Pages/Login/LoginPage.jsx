@@ -1,24 +1,50 @@
 import React from "react";
 import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { auth } from "../../firebase";
+import { auth, db } from "../../firebase"; // Adjust path to your Firebase setup
 import { useNavigate } from "react-router-dom";
+import { doc, setDoc, getDoc } from "firebase/firestore"; // For Firestore
 
 const LoginPage = () => {
-  const navigate = useNavigate(); // Initialize the useNavigate hook
+  const navigate = useNavigate();
+
+  // Create or update the user document in Firestore
+  const createUserDocument = async (user) => {
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    // If the user document doesn't exist, create it
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        email: user.email,
+        displayName: user.displayName,
+      });
+    }
+  };
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      console.log("User:", result.user); // Store user info in state if needed
-      navigate("/home"); // Redirect to the Home page after successful login
+      const user = result.user;
+      console.log("User:", user);
+
+      // Create or update the user document
+      await createUserDocument(user);
+
+      // Navigate to the home page after login
+      navigate("/home");
     } catch (error) {
       console.error("Login Error:", error);
     }
   };
 
-  const logout = () => {
-    signOut(auth);
+  const handleLogout = () => {
+    signOut(auth)
+      .then(() => {
+        // After logout, redirect to the login page
+        navigate("/login");
+      })
+      .catch((error) => console.error("Logout error:", error));
   };
 
   return (
@@ -32,7 +58,7 @@ const LoginPage = () => {
       </button>
 
       <button
-        onClick={logout}
+        onClick={handleLogout}
         className="mt-4 bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded"
       >
         Logout

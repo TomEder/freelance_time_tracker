@@ -1,31 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { auth } from "../../../../firebase"; // Import 'auth' from your firebase.js
+import { onAuthStateChanged } from "firebase/auth"; // Import onAuthStateChanged from 'firebase/auth'
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true); // Add loading state
   const navigate = useNavigate(); // For programmatic navigation
-
-  // Firestore setup
   const db = getFirestore();
 
   useEffect(() => {
-    // Fetch projects from Firestore
-    const fetchProjects = async () => {
-      const projectsCollection = collection(db, "projects"); // Fetch from the 'projects' collection
-      const projectSnapshot = await getDocs(projectsCollection);
-      const projectsList = projectSnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(), // Spread the document data to extract the fields
-      }));
-      setProjects(projectsList); // Set the projects in state
-    };
+    // Listen for authentication state changes
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      if (currentUser) {
+        // Fetch projects from Firestore for the logged-in user
+        const fetchProjects = async () => {
+          try {
+            const projectsCollection = collection(
+              db,
+              `users/${currentUser.uid}/projects`
+            );
+            const projectSnapshot = await getDocs(projectsCollection);
+            const projectsList = projectSnapshot.docs.map((doc) => ({
+              id: doc.id,
+              ...doc.data(), // Spread the document data to extract the fields
+            }));
+            setProjects(projectsList); // Set the projects in state
+          } catch (error) {
+            console.error("Error fetching projects: ", error);
+          } finally {
+            setLoading(false); // Stop loading after fetching projects
+          }
+        };
 
-    fetchProjects();
+        fetchProjects();
+      } else {
+        setLoading(false); // Stop loading if no user is logged in
+      }
+    });
+
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
   }, [db]);
 
+  if (loading) {
+    return <div>Loading projects...</div>; // Display loading message
+  }
+
   if (projects.length === 0) {
-    return <div>Loading projects...</div>;
+    return <div>No projects found.</div>; // Display a message if no projects exist
   }
 
   // Map bgColor number to the corresponding color

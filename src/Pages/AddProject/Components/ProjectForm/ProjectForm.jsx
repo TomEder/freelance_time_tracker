@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Import FontAwesomeIcon
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; // Import the arrow icon
+import { auth } from "../../../../firebase"; // Ensure you import auth
 
 // Firestore setup
 const db = getFirestore();
@@ -31,7 +32,15 @@ const ProjectForm = () => {
       return;
     }
 
-    // Add project to Firestore (without currency)
+    // Get the current authenticated user
+    const currentUser = auth.currentUser;
+
+    if (!currentUser) {
+      alert("No user is logged in.");
+      return;
+    }
+
+    // Add project to Firestore under the current user's collection
     try {
       const newProject = {
         name: projectName,
@@ -39,9 +48,20 @@ const ProjectForm = () => {
         bgColor: selectedColor, // Save selected color
         earnings: 0, // Default earnings to 0
         hours: 0, // Default hours to 0
+        todayTime: 0,
+        weekTime: 0,
+        monthTime: 0,
+        lastSession: 0,
+        billingPeriod: [], // Empty array for billing period by default
       };
-      await addDoc(collection(db, "projects"), newProject);
-      navigate("/Home"); // Redirect to Home after adding project
+
+      // Add to the logged-in user's project collection
+      await addDoc(
+        collection(db, `users/${currentUser.uid}/projects`),
+        newProject
+      );
+
+      navigate("/home"); // Redirect to Home after adding project
     } catch (error) {
       console.error("Error adding project: ", error);
     }
@@ -50,7 +70,7 @@ const ProjectForm = () => {
   return (
     <div className="min-h-screen bg-blue-950 flex flex-col items-center justify-center p-4">
       {/* Back button using FontAwesome */}
-      <button onClick={() => navigate("/Home")} className="text-white mb-4">
+      <button onClick={() => navigate("/home")} className="text-white mb-4">
         <FontAwesomeIcon icon={faArrowLeft} size="2x" /> {/* Back arrow */}
       </button>
 

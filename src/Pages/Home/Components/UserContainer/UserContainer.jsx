@@ -22,10 +22,13 @@ const UserContainer = () => {
           photoURL: currentUser.photoURL,
         });
 
-        // Fetch project data and calculate total earnings
+        // Fetch project data and calculate total earnings for this user
         const fetchTotalEarnings = async () => {
           try {
-            const projectsCollection = collection(db, "projects");
+            const projectsCollection = collection(
+              db,
+              `users/${currentUser.uid}/projects`
+            );
             const projectSnapshot = await getDocs(projectsCollection);
 
             let total = 0;
@@ -43,8 +46,7 @@ const UserContainer = () => {
 
         fetchTotalEarnings();
       } else {
-        // User is not logged in, handle this case if needed
-        setUser(null);
+        setUser(null); // Handle case when user is not logged in
       }
       setLoading(false); // Set loading to false after user state is determined
     });
