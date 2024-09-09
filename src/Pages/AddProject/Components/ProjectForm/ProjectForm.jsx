@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Import FontAwesomeIcon
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; // Import the arrow icon
 
 // Firestore setup
 const db = getFirestore();
@@ -47,6 +49,13 @@ const ProjectForm = () => {
 
   return (
     <div className="min-h-screen bg-blue-950 flex flex-col items-center justify-center p-4">
+      {/* Back button using FontAwesome */}
+      <button onClick={() => navigate("/Home")} className="text-white mb-4">
+        <FontAwesomeIcon icon={faArrowLeft} size="2x" /> {/* Back arrow */}
+      </button>
+
+      <h1 className="text-white text-2xl font-bold mb-20">Add a new project</h1>
+
       <form
         onSubmit={handleSubmit}
         className="flex flex-col items-center gap-4"

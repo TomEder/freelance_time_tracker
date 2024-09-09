@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { auth } from "../../../../firebase"; // Ensure you're using the correct path to your firebase config
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
+  const navigate = useNavigate(); // For programmatic navigation
 
   // Firestore setup
   const db = getFirestore();
@@ -43,10 +44,18 @@ const ProjectsList = () => {
     }
   };
 
+  const handleProjectClick = (id) => {
+    navigate(`/project/${id}`); // Navigate to the project page with the project ID
+  };
+
   return (
     <div className="flex flex-col gap-4 p-4 mt-16">
       {projects.map((project) => (
-        <div key={project.id} className="rounded-lg shadow-lg overflow-hidden">
+        <div
+          key={project.id}
+          className="rounded-lg shadow-lg overflow-hidden cursor-pointer"
+          onClick={() => handleProjectClick(project.id)} // Navigate on project click
+        >
           <div
             style={{ backgroundColor: getColor(project.bgColor) }}
             className="p-4"
