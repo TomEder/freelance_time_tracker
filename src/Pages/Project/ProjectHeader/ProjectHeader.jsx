@@ -1,6 +1,11 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Import FontAwesomeIcon
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; // Import the arrow icon
 
 const ProjectHeader = ({ project }) => {
+  const navigate = useNavigate();
+
   const getColor = (bgColor) => {
     switch (bgColor) {
       case 1:
@@ -21,6 +26,12 @@ const ProjectHeader = ({ project }) => {
       className="p-4 rounded-b-lg shadow-md"
       style={{ backgroundColor: getColor(project.bgColor) }} // Use project bgColor or default
     >
+      <button
+        onClick={() => navigate("/home")}
+        className="text-white mb-4 text-sm"
+      >
+        <FontAwesomeIcon icon={faArrowLeft} size="2x" /> {/* Back arrow */}
+      </button>
       <h3 className="text-white text-sm font-bold">Project</h3>
       <h1 className="text-white text-3xl font-bold">{project.name}</h1>
 
