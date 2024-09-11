@@ -5,6 +5,7 @@ import Home from "./Pages/Home/Home.jsx";
 import AddProject from "./Pages/AddProject/AddProject.jsx";
 import Project from "./Pages/Project/Project.jsx";
 import BillingPeriods from "./Pages/BillingPeriods/BillingPeriods.jsx";
+import EditProjectForm from "./Pages/EditProject/EditProjectForm/EditProjectForm.jsx";
 
 const App = () => {
   return (
@@ -18,6 +19,7 @@ const App = () => {
           path="/project/:id/billing-periods"
           element={<BillingPeriods />}
         />
+        <Route path="/project/:id/edit" element={<EditProjectForm />} />
       </Routes>
     </Router>
   );
