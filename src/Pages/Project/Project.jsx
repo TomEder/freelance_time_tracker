@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom"; // Import useNavigate for navigation
+import { useParams, useNavigate } from "react-router-dom";
 import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
-import { auth } from "../../firebase"; // Import authentication
+import { auth } from "../../firebase";
 import ProjectHeader from "./ProjectHeader/ProjectHeader";
 import ProjectData from "./ProjectData/ProjectData";
 
@@ -25,7 +25,8 @@ const Project = () => {
       const projectDoc = doc(db, `users/${currentUser.uid}/projects`, id);
       const projectSnap = await getDoc(projectDoc);
       if (projectSnap.exists()) {
-        setProject(projectSnap.data());
+        // Attach the project ID to the project data
+        setProject({ id: projectSnap.id, ...projectSnap.data() });
       } else {
         console.error("Project not found");
       }
@@ -37,38 +38,30 @@ const Project = () => {
   const updateProjectTime = async (timeElapsed) => {
     if (project) {
       // Calculate elapsed time in hours and round to the nearest half-hour (e.g., 0.5, 1.0, 1.5, etc.)
-      const elapsedHours = Math.round((timeElapsed / 3600) * 2) / 2; // Rounds to nearest half-hour
+      const elapsedHours = Math.round((timeElapsed / 3600) * 2) / 2;
 
-      // Update the necessary fields: lastSession, todayTime, weekTime, monthTime, billingPeriod
       const newLastSession = timeElapsed;
       const newTodayTime = (project.todayTime || 0) + timeElapsed;
       const newWeekTime = (project.weekTime || 0) + timeElapsed;
       const newMonthTime = (project.monthTime || 0) + timeElapsed;
 
-      // Update the last billing period (assume it's the last index in the array)
       let billingPeriods = project.billingPeriod || [];
       let lastBillingPeriod = billingPeriods[billingPeriods.length - 1] || 0;
 
-      // Add the rounded time to the last billing period
       lastBillingPeriod += elapsedHours;
-
-      // Round the last billing period to 1 decimal place
       lastBillingPeriod = Math.round(lastBillingPeriod * 2) / 2;
-
-      // Update the billing period in the array
       billingPeriods[billingPeriods.length - 1] = lastBillingPeriod;
 
       const projectRef = doc(db, `users/${auth.currentUser.uid}/projects`, id);
       await updateDoc(projectRef, {
-        hours: project.hours + elapsedHours, // Add the rounded hours to the total hours
+        hours: project.hours + elapsedHours,
         lastSession: newLastSession,
         todayTime: newTodayTime,
         weekTime: newWeekTime,
         monthTime: newMonthTime,
-        billingPeriod: billingPeriods, // Update the billing period array
+        billingPeriod: billingPeriods,
       });
 
-      // Update local project state to reflect changes immediately
       setProject((prev) => ({
         ...prev,
         hours: prev.hours + elapsedHours,
