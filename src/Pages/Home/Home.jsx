@@ -12,7 +12,7 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-blue-950 min-h-screen relative">
+    <div className="bg-slate-900 min-h-screen relative">
       <UserContainer />
 
       {/* Plus Button */}

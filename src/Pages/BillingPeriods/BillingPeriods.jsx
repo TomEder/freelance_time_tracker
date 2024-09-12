@@ -1,49 +1,55 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getFirestore, doc, getDoc } from "firebase/firestore";
-import { auth } from "../../firebase"; // Import auth for accessing current user
+import { fetchProject } from "../../Services/FirebaseService"; // Import Firebase service for fetching project
 
 const BillingPeriods = () => {
   const { id } = useParams(); // Get project ID from the URL
   const [billingPeriods, setBillingPeriods] = useState([]);
   const [error, setError] = useState(null); // State to store error message
-  const db = getFirestore();
   const navigate = useNavigate(); // To navigate programmatically
 
   useEffect(() => {
     const fetchBillingPeriods = async () => {
       try {
-        // Get the current authenticated user
-        const currentUser = auth.currentUser;
-        if (!currentUser) {
-          setError("No user is logged in.");
-          return;
-        }
-
-        // Fetch the project from the user's collection
-        const projectDoc = doc(db, `users/${currentUser.uid}/projects`, id);
-        const projectSnap = await getDoc(projectDoc);
-
-        if (projectSnap.exists()) {
-          const data = projectSnap.data();
-          if (data.billingPeriod && Array.isArray(data.billingPeriod)) {
-            setBillingPeriods(data.billingPeriod);
-          } else {
-            setError("No billing periods found in this project.");
-          }
+        const projectData = await fetchProject(id); // Use Firebase service to fetch project data
+        if (
+          projectData &&
+          projectData.billingPeriod &&
+          Array.isArray(projectData.billingPeriod)
+        ) {
+          setBillingPeriods(projectData.billingPeriod);
         } else {
-          setError("No project found for the given ID.");
+          setError("No billing periods found in this project.");
         }
       } catch (err) {
         setError("An error occurred while fetching the project data.");
+        console.error("Error fetching billing periods:", err);
       }
     };
 
     fetchBillingPeriods();
-  }, [id, db]);
+  }, [id]);
+
+  const getMonthName = (month) => {
+    const monthNames = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return monthNames[month - 1];
+  };
 
   return (
-    <div className="min-h-screen bg-blue-950 p-4">
+    <div className="min-h-screen bg-slate-900 p-4">
       <h1 className="text-white text-2xl font-bold mb-4">Billing Periods</h1>
 
       <div className="bg-blue-800 p-4 rounded-lg">
@@ -53,7 +59,9 @@ const BillingPeriods = () => {
           <ul>
             {billingPeriods.map((period, index) => (
               <li key={index} className="text-white text-lg">
-                Billing Period {index + 1}: {period.toFixed(1)} hours
+                Billing Period {getMonthName(period.month)} {period.year}:{" "}
+                {period.hours.toFixed(1)} hours, Earned:{" "}
+                {period.earnings.toFixed(2)} kr
               </li>
             ))}
           </ul>

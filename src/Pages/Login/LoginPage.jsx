@@ -1,35 +1,14 @@
 import React from "react";
-import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
-import { auth, db } from "../../firebase"; // Adjust path to your Firebase setup
 import { useNavigate } from "react-router-dom";
-import { doc, setDoc, getDoc } from "firebase/firestore"; // For Firestore
+import { signInWithGoogle, signOutUser } from "../../Services/FirebaseService"; // Import the correct services
 
 const LoginPage = () => {
   const navigate = useNavigate();
 
-  // Create or update the user document in Firestore
-  const createUserDocument = async (user) => {
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    // If the user document doesn't exist, create it
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email,
-        displayName: user.displayName,
-      });
-    }
-  };
-
   const loginWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      const user = await signInWithGoogle(); // Use the FirebaseService function
       console.log("User:", user);
-
-      // Create or update the user document
-      await createUserDocument(user);
 
       // Navigate to the home page after login
       navigate("/home");
@@ -38,13 +17,13 @@ const LoginPage = () => {
     }
   };
 
-  const handleLogout = () => {
-    signOut(auth)
-      .then(() => {
-        // After logout, redirect to the login page
-        navigate("/login");
-      })
-      .catch((error) => console.error("Logout error:", error));
+  const handleLogout = async () => {
+    try {
+      await signOutUser(); // Use the FirebaseService function
+      navigate("/login"); // After logout, redirect to the login page
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
