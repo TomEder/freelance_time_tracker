@@ -1,12 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getFirestore, doc, getDoc, updateDoc } from "firebase/firestore";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Import FontAwesomeIcon
-import { faArrowLeft } from "@fortawesome/free-solid-svg-icons"; // Import the arrow icon
-import { auth } from "../../../firebase"; // Ensure you import auth
-
-// Firestore setup
-const db = getFirestore();
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { fetchProject, updateProject } from "../../../Services/FirebaseService"; // Use Firebase service functions
 
 const EditProjectForm = () => {
   const [projectName, setProjectName] = useState("");
@@ -27,24 +23,18 @@ const EditProjectForm = () => {
   // Fetch the project data when the component mounts
   useEffect(() => {
     const fetchProjectData = async () => {
-      const currentUser = auth.currentUser;
-
-      if (!currentUser) {
-        console.error("No user is logged in.");
-        return;
-      }
-
-      const projectDoc = doc(db, `users/${currentUser.uid}/projects`, id);
-      const projectSnap = await getDoc(projectDoc);
-
-      if (projectSnap.exists()) {
-        const projectData = projectSnap.data();
-        setProjectName(projectData.name);
-        setHourlyPay(projectData.payPerHour);
-        setCurrency("SEK"); // Assuming you're using a default value of "SEK"
-        setSelectedColor(projectData.bgColor);
-      } else {
-        console.error("Project not found.");
+      try {
+        const projectData = await fetchProject(id); // Use Firebase service
+        if (projectData) {
+          setProjectName(projectData.name);
+          setHourlyPay(projectData.payPerHour);
+          setCurrency("SEK"); // Assuming you're using a default value of "SEK"
+          setSelectedColor(projectData.bgColor);
+        } else {
+          console.error("Project not found.");
+        }
+      } catch (error) {
+        console.error("Error fetching project:", error);
       }
     };
 
@@ -60,32 +50,22 @@ const EditProjectForm = () => {
       return;
     }
 
-    // Get the current authenticated user
-    const currentUser = auth.currentUser;
-
-    if (!currentUser) {
-      alert("No user is logged in.");
-      return;
-    }
-
-    // Update the project in Firestore
+    // Update the project using the service function
     try {
-      const projectRef = doc(db, `users/${currentUser.uid}/projects`, id);
-
-      await updateDoc(projectRef, {
+      await updateProject(id, {
         name: projectName,
         payPerHour: Number(hourlyPay),
-        bgColor: selectedColor, // Save selected color
+        bgColor: selectedColor,
       });
 
       navigate("/home"); // Redirect to Home after updating project
     } catch (error) {
-      console.error("Error updating project: ", error);
+      console.error("Error updating project:", error);
     }
   };
 
   return (
-    <div className="min-h-screen bg-blue-950 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
       {/* Back button using FontAwesome */}
       <button onClick={() => navigate("/home")} className="text-white mb-4">
         <FontAwesomeIcon icon={faArrowLeft} size="2x" /> {/* Back arrow */}

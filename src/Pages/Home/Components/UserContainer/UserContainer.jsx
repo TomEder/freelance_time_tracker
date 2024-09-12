@@ -1,16 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { auth } from "../../../../firebase";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth"; // Import the listener for auth state changes
-
-// Firestore setup
-const db = getFirestore();
+import { onAuthStateChanged } from "firebase/auth";
+import { fetchAllProjects } from "../../../../Services/FirebaseService"; // Use Firebase service
 
 const UserContainer = () => {
   const [user, setUser] = useState(null);
   const [totalEarnings, setTotalEarnings] = useState(0);
-  const [error, setError] = useState(null); // Error state
-  const [loading, setLoading] = useState(true); // Loading state for user
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Listen for authentication state changes
@@ -22,50 +19,42 @@ const UserContainer = () => {
           photoURL: currentUser.photoURL,
         });
 
-        // Fetch project data and calculate total earnings for this user
-        const fetchTotalEarnings = async () => {
+        // Fetch all projects using the service and calculate total earnings
+        const fetchEarnings = async () => {
           try {
-            const projectsCollection = collection(
-              db,
-              `users/${currentUser.uid}/projects`
+            const projects = await fetchAllProjects();
+            const total = projects.reduce(
+              (acc, project) => acc + (project.earnings || 0),
+              0
             );
-            const projectSnapshot = await getDocs(projectsCollection);
-
-            let total = 0;
-            projectSnapshot.forEach((doc) => {
-              const data = doc.data();
-              total += data.earnings || 0; // Add earnings from each project
-            });
-
             setTotalEarnings(total);
           } catch (err) {
             setError("Failed to fetch project earnings.");
-            console.error("Firestore error:", err);
+            console.error("Error fetching earnings:", err);
           }
         };
 
-        fetchTotalEarnings();
+        fetchEarnings();
       } else {
-        setUser(null); // Handle case when user is not logged in
+        setUser(null); // No user is logged in
       }
-      setLoading(false); // Set loading to false after user state is determined
+      setLoading(false); // Set loading to false after checking user state
     });
 
-    // Cleanup the listener on component unmount
-    return () => unsubscribe();
+    return () => unsubscribe(); // Cleanup listener on unmount
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>; // Show a loading state while checking auth
+    return <div>Loading...</div>;
   }
 
   if (!user) {
-    return <div>No user data available</div>; // Handle case where user is not logged in
+    return <div>No user data available</div>;
   }
 
   return (
-    <div className="bg-blue-600 rounded-b-lg w-full shadow-xl">
-      {/* User Info Section */}
+    <div className="bg-sky-700 rounded-b-lg w-full shadow-xl">
+      {/* User Info */}
       <div className="flex items-center mb-4">
         <img
           src={user.photoURL || "https://via.placeholder.com/50"}
@@ -80,8 +69,8 @@ const UserContainer = () => {
         </div>
       </div>
 
-      {/* Earned Section */}
-      <div className="bg-blue-800 rounded-lg p-4 w-full shadow-inner text-center">
+      {/* Earnings Section */}
+      <div className="bg-sky-800 rounded-lg p-4 w-full shadow-inner text-center">
         <h3 className="text-gray-300 text-sm">Total earnings</h3>
         {error ? (
           <p className="text-red-500 text-lg font-bold">{error}</p>

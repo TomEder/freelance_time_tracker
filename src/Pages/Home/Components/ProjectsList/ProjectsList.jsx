@@ -1,68 +1,58 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
-import { auth } from "../../../../firebase"; // Import 'auth' from your firebase.js
-import { onAuthStateChanged } from "firebase/auth"; // Import onAuthStateChanged from 'firebase/auth'
+import { onAuthStateChanged } from "firebase/auth";
+import { fetchAllProjects } from "../../../../Services/FirebaseService"; // Use the Firebase service
+import { auth } from "../../../../firebase"; // Import auth for authentication
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
-  const [loading, setLoading] = useState(true); // Add loading state
-  const navigate = useNavigate(); // For programmatic navigation
-  const db = getFirestore();
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Listen for authentication state changes
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       if (currentUser) {
-        // Fetch projects from Firestore for the logged-in user
+        // Fetch all projects using Firebase service
         const fetchProjects = async () => {
           try {
-            const projectsCollection = collection(
-              db,
-              `users/${currentUser.uid}/projects`
-            );
-            const projectSnapshot = await getDocs(projectsCollection);
-            const projectsList = projectSnapshot.docs.map((doc) => ({
-              id: doc.id,
-              ...doc.data(), // Spread the document data to extract the fields
-            }));
-            setProjects(projectsList); // Set the projects in state
+            const projectsList = await fetchAllProjects();
+            setProjects(projectsList); // Set the fetched projects in state
           } catch (error) {
             console.error("Error fetching projects: ", error);
           } finally {
-            setLoading(false); // Stop loading after fetching projects
+            setLoading(false); // Stop loading
           }
         };
 
         fetchProjects();
       } else {
-        setLoading(false); // Stop loading if no user is logged in
+        setLoading(false); // No user is logged in, stop loading
       }
     });
 
-    // Clean up the listener on component unmount
-    return () => unsubscribe();
-  }, [db]);
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, []);
 
   if (loading) {
-    return <div>Loading projects...</div>; // Display loading message
+    return <div>Loading projects...</div>;
   }
 
   if (projects.length === 0) {
-    return <div>No projects found.</div>; // Display a message if no projects exist
+    return <div>No projects found.</div>;
   }
 
   // Map bgColor number to the corresponding color
   const getColor = (bgColor) => {
     switch (bgColor) {
       case 1:
-        return "#EF812C"; // Color 1
+        return "#91511F"; // Color 1
       case 2:
-        return "#33B58E"; // Color 2
+        return "#037C58"; // Color 2
       case 3:
-        return "#A1299F"; // Color 3
+        return "#721A70"; // Color 3
       case 4:
-        return "#BE0707"; // Color 4
+        return "#671313"; // Color 4
       default:
         return "#333"; // Default color if no valid bgColor is found
     }
@@ -82,12 +72,12 @@ const ProjectsList = () => {
         >
           <div
             style={{ backgroundColor: getColor(project.bgColor) }}
-            className="p-4"
+            className="p-2 h-14"
           >
             <h3 className="text-white text-sm font-bold">Project</h3>
             <h2 className="text-white text-xl font-semibold">{project.name}</h2>
           </div>
-          <div className="bg-blue-800 p-4 flex justify-between items-center">
+          <div className="bg-sky-800 p-4 flex justify-between items-center">
             <div className="text-center">
               <h4 className="text-gray-300 text-sm">Work</h4>
               <p className="text-white text-2xl font-bold">{project.hours}h</p>

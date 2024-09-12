@@ -9,13 +9,13 @@ const ProjectHeader = ({ project }) => {
   const getColor = (bgColor) => {
     switch (bgColor) {
       case 1:
-        return "#EF812C"; // Color 1
+        return "#91511F"; // Color 1
       case 2:
-        return "#33B58E"; // Color 2
+        return "#037C58"; // Color 2
       case 3:
-        return "#A1299F"; // Color 3
+        return "#721A70"; // Color 3
       case 4:
-        return "#BE0707"; // Color 4
+        return "#671313"; // Color 4
       default:
         return "#333"; // Default color if no valid bgColor is found
     }
@@ -33,17 +33,17 @@ const ProjectHeader = ({ project }) => {
         <FontAwesomeIcon icon={faArrowLeft} size="2x" /> {/* Back arrow */}
       </button>
       <h3 className="text-white text-sm font-bold">Project</h3>
-      <h1 className="text-white text-3xl font-bold">{project.name}</h1>
-
-      <div className="flex justify-around mt-4">
-        <div className="bg-blue-800 p-4 rounded-lg text-center">
+      <h1 className="text-white text-3xl mb-4 font-bold">{project.name}</h1>
+      <hr />
+      <div className="flex justify-around">
+        <div className="p-4 rounded-lg text-center">
           <h4 className="text-gray-300 text-sm">Hourly pay</h4>
           <p className="text-white text-2xl font-bold">
             {project.payPerHour}kr
           </p>
         </div>
-        <div className="bg-blue-800 p-4 rounded-lg text-center">
-          <h4 className="text-gray-300 text-sm">Earned</h4>
+        <div className="p-4 rounded-lg text-center">
+          <h4 className="text-gray-300 text-sm">Total earnings</h4>
           <p className="text-white text-2xl font-bold">{project.earnings}kr</p>
         </div>
       </div>

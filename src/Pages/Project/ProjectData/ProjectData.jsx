@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faStop, faPlay } from "@fortawesome/free-solid-svg-icons";
+import { updateEarnings } from "../../../Services/FirebaseService"; // Import the service function
 
 const ProjectData = ({ project, updateProjectTime }) => {
   const [timerActive, setTimerActive] = useState(false);
   const [timeElapsed, setTimeElapsed] = useState(0); // In seconds
   const [startTime, setStartTime] = useState(null);
-  const navigate = useNavigate(); // Add useNavigate hook
+  const navigate = useNavigate();
 
   useEffect(() => {
     let interval;
@@ -24,10 +27,33 @@ const ProjectData = ({ project, updateProjectTime }) => {
     setTimerActive(true);
   };
 
-  const handleStopTimer = () => {
+  const handleStopTimer = async () => {
     setTimerActive(false);
-    updateProjectTime(timeElapsed); // Send timeElapsed back to update total project time
-    setTimeElapsed(0); // Reset the timer
+    try {
+      // Ensure project.id exists
+      if (!project.id) {
+        console.error("Project ID is missing:", project);
+        return;
+      }
+
+      // Add logging for debugging purposes
+      console.log("Stopping timer for project:", project.id);
+
+      // Update the project and billing period with the elapsed time and earnings
+      const { totalEarnings, billingPeriods } = await updateEarnings(
+        project.id,
+        timeElapsed,
+        project.payPerHour
+      );
+      console.log("Updated total earnings:", totalEarnings);
+      console.log("Updated billing periods:", billingPeriods);
+      setTimeElapsed(0); // Reset the timer after stopping
+
+      // Optionally, update the parent state (if needed)
+      updateProjectTime(timeElapsed);
+    } catch (error) {
+      console.error("Failed to update earnings:", error);
+    }
   };
 
   const formatTime = (totalSeconds) => {
@@ -42,22 +68,41 @@ const ProjectData = ({ project, updateProjectTime }) => {
     return (hours * hourlyRate).toFixed(2); // Earnings rounded to 2 decimal places
   };
 
+  const getColor = (bgColor) => {
+    switch (bgColor) {
+      case 1:
+        return "#91511F"; // Color 1
+      case 2:
+        return "#037C58"; // Color 2
+      case 3:
+        return "#721A70"; // Color 3
+      case 4:
+        return "#671313"; // Color 4
+      default:
+        return "#333"; // Default color if no valid bgColor is found
+    }
+  };
+
   return (
-    <div className="p-4 bg-blue-800 rounded-lg m-4">
+    <div className="p-4" style={{ backgroundColor: getColor(project.bgColor) }}>
       {/* Timer section */}
-      <div className="bg-blue-400 p-4 text-white rounded-lg text-center">
+      <div className="p-4 text-white rounded-lg text-center">
         <h4 className="text-sm">This session</h4>
         <div className="flex justify-center items-center mt-2">
           {timerActive ? (
             <button
               onClick={handleStopTimer}
-              className="bg-black w-8 h-8 rounded-full mr-4"
-            />
+              className="bg-red-600 w-8 h-8 rounded-full mr-4 text-white"
+            >
+              <FontAwesomeIcon icon={faStop} />
+            </button>
           ) : (
             <button
               onClick={handleStartTimer}
-              className="bg-white w-8 h-8 rounded-full mr-4"
-            />
+              className="bg-green-500 w-8 h-8 rounded-full mr-4 text-white"
+            >
+              <FontAwesomeIcon icon={faPlay} />
+            </button>
           )}
           <p className="text-2xl font-bold">{formatTime(timeElapsed)}</p>
         </div>
@@ -65,35 +110,31 @@ const ProjectData = ({ project, updateProjectTime }) => {
 
       {/* Project stats */}
       <div className="grid grid-cols-2 gap-4 mt-4">
-        <div className="bg-blue-500 p-4 rounded-lg text-center">
+        <div className="p-4 rounded-lg text-center">
           <h4 className="text-sm text-white">Last session</h4>
           <p className="text-2xl font-bold text-white">
-            {formatTime(project.lastSession || 0)}{" "}
-            {/* Default to 0 if undefined */}
+            {formatTime(project.lastSession || 0)}
           </p>
         </div>
-        <div className="bg-blue-500 p-4 rounded-lg text-center">
+        <div className=" p-4 rounded-lg text-center">
           <h4 className="text-sm text-white">Today</h4>
           <p className="text-2xl font-bold text-white">
-            {formatTime(project.todayTime || 0)}{" "}
-            {/* Default to 0 if undefined */}
+            {formatTime(project.todayTime || 0)}
           </p>
         </div>
-        <div className="bg-blue-500 p-4 rounded-lg text-center">
+        <div className=" p-4 rounded-lg text-center">
           <h4 className="text-sm text-white">This week</h4>
           <p className="text-2xl font-bold text-white">
-            {formatTime(project.weekTime || 0)}{" "}
-            {/* Default to 0 if undefined */}
+            {formatTime(project.weekTime || 0)}
           </p>
         </div>
-        <div className="bg-blue-500 p-4 rounded-lg text-center">
+        <div className=" p-4 rounded-lg text-center">
           <h4 className="text-sm text-white">This month</h4>
           <p className="text-2xl font-bold text-white">
-            {formatTime(project.monthTime || 0)}{" "}
-            {/* Default to 0 if undefined */}
+            {formatTime(project.monthTime || 0)}
           </p>
         </div>
-        <div className="col-span-2 bg-blue-500 p-4 rounded-lg text-center">
+        <div className="col-span-2 p-4 rounded-lg text-center">
           <h4 className="text-sm text-white">This billing period</h4>
           <p className="text-2xl font-bold text-white">
             {calculateEarnings(project.monthTime || 0, project.payPerHour || 0)}{" "}
@@ -105,13 +146,13 @@ const ProjectData = ({ project, updateProjectTime }) => {
       {/* Buttons */}
       <div className="mt-4 flex justify-around">
         <button
-          className="bg-blue-500 text-white py-2 px-4 rounded"
-          onClick={() => navigate(`/project/${project.id}/billing-periods`)} // Navigate to the billing periods page
+          className="bg-sky-500 text-white py-2 px-4 rounded"
+          onClick={() => navigate(`/project/${project.id}/billing-periods`)}
         >
           See all billing periods
         </button>
         <button
-          className="bg-blue-500 text-white py-2 px-4 rounded"
+          className="bg-sky-500 text-white py-2 px-4 rounded"
           onClick={() => navigate(`/project/${project.id}/edit`)}
         >
           Edit project
