@@ -60,8 +60,8 @@ const BillingPeriods = () => {
             {billingPeriods.map((period, index) => (
               <li key={index} className="text-white text-lg">
                 Billing Period {getMonthName(period.month)} {period.year}:{" "}
-                {period.hours.toFixed(1)} hours, Earned:{" "}
-                {period.earnings.toFixed(2)} kr
+                {(period.hours || 0).toFixed(1)} hours, Earned:{" "}
+                {(period.earnings || 0).toFixed(2)} kr
               </li>
             ))}
           </ul>

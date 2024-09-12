@@ -85,7 +85,7 @@ const ProjectsList = () => {
             <div className="text-center">
               <h4 className="text-gray-300 text-sm">Earned</h4>
               <p className="text-white text-2xl font-bold">
-                {project.earnings} kr
+                {project.earnings.toFixed(1)} kr
               </p>
             </div>
           </div>

@@ -151,7 +151,11 @@ const Project = () => {
       style={{ backgroundColor: getColor(project.bgColor) }}
     >
       <ProjectHeader project={project} />
-      <ProjectData project={project} updateProjectTime={updateProjectTime} />
+      <ProjectData
+        project={project}
+        updateProjectTime={updateProjectTime}
+        setProject={setProject}
+      />
     </div>
   );
 };

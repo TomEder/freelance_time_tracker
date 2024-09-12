@@ -44,7 +44,9 @@ const ProjectHeader = ({ project }) => {
         </div>
         <div className="p-4 rounded-lg text-center">
           <h4 className="text-gray-300 text-sm">Total earnings</h4>
-          <p className="text-white text-2xl font-bold">{project.earnings}kr</p>
+          <p className="text-white text-2xl font-bold">
+            {project.earnings.toFixed(1)}kr
+          </p>
         </div>
       </div>
     </div>

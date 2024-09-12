@@ -75,7 +75,9 @@ const UserContainer = () => {
         {error ? (
           <p className="text-red-500 text-lg font-bold">{error}</p>
         ) : (
-          <p className="text-white text-3xl font-bold">{totalEarnings} kr</p>
+          <p className="text-white text-3xl font-bold">
+            {totalEarnings.toFixed(1)} kr
+          </p>
         )}
       </div>
     </div>
