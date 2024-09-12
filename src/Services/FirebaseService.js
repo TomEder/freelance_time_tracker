@@ -122,23 +122,28 @@ export const updateEarnings = async (projectId, elapsedTime, payPerHour) => {
     if (!projectSnap.exists()) throw new Error("Project not found");
 
     const projectData = projectSnap.data();
-    const elapsedHours = elapsedTime / 3600; // Convert seconds to hours
+    const payPerHour = Number(projectData.payPerHour);
+    const elapsedHours = Number(elapsedTime) / 3600; // Convert seconds to hours
+    let sessionEarnings = elapsedHours * payPerHour; // Ensure payPerHour is valid
 
-    // Calculate earnings for this session
-    const sessionEarnings = elapsedHours * payPerHour;
+    sessionEarnings = Number(sessionEarnings.toFixed(1)); // Round to 1 decimal places
 
-    // Get current month and year
+    console.log(
+      `Elapsed hours: ${elapsedHours}, Pay per hour: ${payPerHour}, Session earnings: ${sessionEarnings}`
+    );
+
+    // Get the current date to find or create the correct billing period
     const currentDate = new Date();
-    const currentMonth = currentDate.getMonth() + 1;
+    const currentMonth = currentDate.getMonth() + 1; // getMonth is 0-indexed
     const currentYear = currentDate.getFullYear();
 
-    // Check if a billing period exists for the current month
+    // Find the current billing period
     let billingPeriods = projectData.billingPeriod || [];
     let currentBillingPeriod = billingPeriods.find(
       (period) => period.month === currentMonth && period.year === currentYear
     );
 
-    // If no billing period for this month, create one
+    // If no billing period exists for the current month, create one
     if (!currentBillingPeriod) {
       currentBillingPeriod = {
         hours: 0,
@@ -147,22 +152,26 @@ export const updateEarnings = async (projectId, elapsedTime, payPerHour) => {
         year: currentYear,
       };
       billingPeriods.push(currentBillingPeriod);
+    } else {
+      currentBillingPeriod.earnings = currentBillingPeriod.earnings || 0;
     }
 
     // Update the current billing period's hours and earnings
     currentBillingPeriod.hours += elapsedHours;
     currentBillingPeriod.earnings += sessionEarnings;
 
-    // Sum all billing period earnings to calculate total project earnings
+    // Recalculate total earnings by summing all billing period earnings
     const totalEarnings = billingPeriods.reduce(
       (acc, period) => acc + (period.earnings || 0),
       0
     );
 
-    // Update the project in Firebase with the new total earnings and billing periods
+    console.log("Updated billing periods:", billingPeriods);
+
+    // Push updated billing periods and earnings to Firebase
     await updateDoc(projectRef, {
-      earnings: totalEarnings, // Total earnings for the project
-      billingPeriod: billingPeriods, // Updated billing periods
+      earnings: totalEarnings,
+      billingPeriod: billingPeriods,
     });
 
     return {
