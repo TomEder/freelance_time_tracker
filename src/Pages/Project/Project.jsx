@@ -122,21 +122,6 @@ const Project = () => {
     }
   };
 
-  const getColor = (bgColor) => {
-    switch (bgColor) {
-      case 1:
-        return "#91511F"; // Color 1
-      case 2:
-        return "#037C58"; // Color 2
-      case 3:
-        return "#721A70"; // Color 3
-      case 4:
-        return "#671313"; // Color 4
-      default:
-        return "#333"; // Default color if no valid bgColor is found
-    }
-  };
-
   if (loading) {
     return <div>Loading...</div>;
   }
@@ -146,10 +131,7 @@ const Project = () => {
   }
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: getColor(project.bgColor) }}
-    >
+    <div className="min-h-screen bg-[#171718]">
       <ProjectHeader project={project} />
       <ProjectData
         project={project}

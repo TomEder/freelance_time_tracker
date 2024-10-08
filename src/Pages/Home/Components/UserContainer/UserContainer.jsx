@@ -62,7 +62,7 @@ const UserContainer = () => {
           className="w-12 h-12 rounded-full m-4"
         />
         <div>
-          <h2 className="text-white text-lg font-semibold uppercase">
+          <h2 className="text-white text-lg uppercase">
             {user.displayName || "User"}
           </h2>
           <p className="text-gray-200 text-sm uppercase">{user.email}</p>

@@ -22,29 +22,47 @@ const ProjectHeader = ({ project }) => {
   };
 
   return (
-    <div
-      className="p-4 rounded-b-lg shadow-md"
-      style={{ backgroundColor: getColor(project.bgColor) }} // Use project bgColor or default
-    >
+    <div className="p-4 rounded-b-lg shadow-md bg-[#171718]">
       <button
         onClick={() => navigate("/home")}
-        className="text-white mb-4 text-sm"
+        className="mb-4 text-sm"
+        style={{ color: getColor(project.bgColor) }}
       >
         <FontAwesomeIcon icon={faArrowLeft} size="2x" /> {/* Back arrow */}
       </button>
-      <h3 className="text-white text-sm font-bold">Project</h3>
-      <h1 className="text-white text-3xl mb-4 font-bold">{project.name}</h1>
-      <hr />
+      <h3
+        className="text-sm font-bold"
+        style={{ color: getColor(project.bgColor) }}
+      >
+        Project
+      </h3>
+      <h1
+        className="text-3xl mb-4 font-bold"
+        style={{ color: getColor(project.bgColor) }}
+      >
+        {project.name}
+      </h1>
+      <hr style={{ borderColor: getColor(project.bgColor) }} />
       <div className="flex justify-around">
         <div className="p-4 rounded-lg text-center">
-          <h4 className="text-gray-300 text-sm">Hourly pay</h4>
-          <p className="text-white text-2xl font-bold">
+          <h4 className="text-sm" style={{ color: getColor(project.bgColor) }}>
+            Hourly pay
+          </h4>
+          <p
+            className="text-2xl font-bold"
+            style={{ color: getColor(project.bgColor) }}
+          >
             {project.payPerHour}kr
           </p>
         </div>
         <div className="p-4 rounded-lg text-center">
-          <h4 className="text-gray-300 text-sm">Total earnings</h4>
-          <p className="text-white text-2xl font-bold">
+          <h4 className="text-sm" style={{ color: getColor(project.bgColor) }}>
+            Total earnings
+          </h4>
+          <p
+            className="text-2xl font-bold"
+            style={{ color: getColor(project.bgColor) }}
+          >
             {project.earnings.toFixed(1)}kr
           </p>
         </div>
