@@ -65,13 +65,13 @@ const EditProjectForm = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#171718] flex flex-col items-center justify-center p-4">
       {/* Back button using FontAwesome */}
-      <button onClick={() => navigate("/home")} className="text-white mb-4">
+      <button onClick={() => navigate("/home")} className="text-[#D35400] mb-4">
         <FontAwesomeIcon icon={faArrowLeft} size="2x" /> {/* Back arrow */}
       </button>
 
-      <h1 className="text-white text-2xl font-bold mb-20">Edit Project</h1>
+      <h1 className="text-[#D35400] text-2xl mb-20">EDIT PROJECT</h1>
 
       <form
         onSubmit={handleSubmit}
@@ -107,7 +107,7 @@ const EditProjectForm = () => {
         </select>
 
         {/* Project color selection */}
-        <div className="text-white mt-4">Project colour</div>
+        <div className="text-[#D35400] mt-4">PROJECT COLOUR</div>
         <div className="flex gap-4 mt-2">
           {colors.map((color) => (
             <button
@@ -126,9 +126,9 @@ const EditProjectForm = () => {
         {/* Submit button */}
         <button
           type="submit"
-          className="mt-6 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded"
+          className="mt-6 bg-[#D35400] hover:bg-[#a14100] text-white py-2 px-4 rounded"
         >
-          Update project
+          UPDATE PROJECT
         </button>
       </form>
     </div>

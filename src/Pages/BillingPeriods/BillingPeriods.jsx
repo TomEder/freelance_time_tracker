@@ -49,19 +49,24 @@ const BillingPeriods = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 p-4">
-      <h1 className="text-white text-2xl font-bold mb-4">Billing Periods</h1>
+    <div className="min-h-screen bg-[#171718] p-4">
+      <h1 className="text-[#D35400] text-2xl text-center mb-4">
+        BILLING PERIODS
+      </h1>
 
-      <div className="bg-blue-800 p-4 rounded-lg">
+      <div className="p-4 rounded-lg">
         {error ? (
           <p className="text-red-500 text-lg">{error}</p>
         ) : billingPeriods.length > 0 ? (
           <ul>
             {billingPeriods.map((period, index) => (
-              <li key={index} className="text-white text-lg">
-                Billing Period {getMonthName(period.month)} {period.year}:{" "}
-                {(period.hours || 0).toFixed(1)} hours, Earned:{" "}
-                {(period.earnings || 0).toFixed(2)} kr
+              <li
+                key={index}
+                className="text-white border-2 border-[#D35400] text-lg mb-2 rounded p-2 uppercase"
+              >
+                {getMonthName(period.month)} {period.year}: <br />
+                {(period.hours || 0).toFixed(1)} HOURS <br />
+                Earned: {(period.earnings || 0).toFixed(2)} kr
               </li>
             ))}
           </ul>
@@ -72,7 +77,7 @@ const BillingPeriods = () => {
 
       <button
         onClick={() => navigate(-1)} // Navigate back to the project page
-        className="bg-blue-500 text-white py-2 px-4 rounded mt-4"
+        className="bg-[#D35400] text-white py-2 px-4 rounded mt-4"
       >
         Back to Project
       </button>

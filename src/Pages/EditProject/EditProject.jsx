@@ -4,7 +4,7 @@ import EditProjectForm from "./EditProjectForm/EditProjectForm"; // Import the f
 const EditProject = () => {
   return (
     <div>
-      <h1 className="text-white text-2xl font-bold mb-4">Edit Project</h1>
+      <h1 className="text-[#D35400] text-2xl font-bold mb-4">Edit Project</h1>
       {/* Render the EditProjectForm component */}
       <EditProjectForm />
     </div>
