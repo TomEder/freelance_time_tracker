@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { signInWithGoogle, signOutUser } from "../../Services/FirebaseService";
+import { signInWithGoogle } from "../../Services/FirebaseService";
 import LoginBG from "../../Images/LoginBG.png";
 
 const LoginPage = () => {
@@ -16,14 +16,14 @@ const LoginPage = () => {
     }
   };
 
-  const handleLogout = async () => {
+  /* const handleLogout = async () => {
     try {
       await signOutUser();
       navigate("/login");
     } catch (error) {
       console.error("Logout error:", error);
     }
-  };
+  }; */
 
   return (
     <div
