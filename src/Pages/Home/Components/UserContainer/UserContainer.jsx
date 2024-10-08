@@ -53,7 +53,7 @@ const UserContainer = () => {
   }
 
   return (
-    <div className="bg-sky-700 rounded-b-lg w-full shadow-xl">
+    <div className="bg-[#171718] rounded-b-lg w-full shadow-xl">
       {/* User Info */}
       <div className="flex items-center mb-4">
         <img
@@ -62,16 +62,16 @@ const UserContainer = () => {
           className="w-12 h-12 rounded-full m-4"
         />
         <div>
-          <h2 className="text-white text-lg font-semibold">
+          <h2 className="text-white text-lg font-semibold uppercase">
             {user.displayName || "User"}
           </h2>
-          <p className="text-gray-200 text-sm">{user.email}</p>
+          <p className="text-gray-200 text-sm uppercase">{user.email}</p>
         </div>
       </div>
 
       {/* Earnings Section */}
-      <div className="bg-sky-800 rounded-lg p-4 w-full shadow-inner text-center">
-        <h3 className="text-gray-300 text-sm">Total earnings</h3>
+      <div className="bg-[#1C1C1D] border-2 border-[#D35400] rounded-lg p-4 w-full shadow-inner text-center">
+        <h3 className="text-gray-300 text-sm">TOTAL EARNINGS</h3>
         {error ? (
           <p className="text-red-500 text-lg font-bold">{error}</p>
         ) : (

@@ -12,12 +12,12 @@ const Home = () => {
   };
 
   return (
-    <div className="bg-slate-900 min-h-screen relative">
+    <div className="bg-[#171718] min-h-screen relative">
       <UserContainer />
 
       {/* Plus Button */}
       <button
-        className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 w-14 h-14 flex items-center justify-center text-lg shadow-lg absolute mt-2 right-6"
+        className="bg-[#D35400] hover:bg-blue-700 text-white rounded-full p-4 w-14 h-14 flex items-center justify-center text-lg shadow-lg absolute mt-2 right-6"
         onClick={goToAddProject} // Navigate on click
       >
         <img src={plusIcon} alt="plus icon" />
