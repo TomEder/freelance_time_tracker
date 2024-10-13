@@ -22,8 +22,7 @@ const BillingPeriods = () => {
           setError("No billing periods found in this project.");
         }
       } catch (err) {
-        setError("An error occurred while fetching the project data.");
-        console.error("Error fetching billing periods:", err);
+        setError("Error fetching billing periods.");
       }
     };
 

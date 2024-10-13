@@ -6,6 +6,7 @@ import {
   collection,
   getDocs,
   addDoc,
+  deleteDoc,
 } from "firebase/firestore";
 import {
   GoogleAuthProvider,
@@ -93,6 +94,17 @@ export const updateProject = async (projectId, updatedData) => {
     await updateDoc(projectRef, updatedData);
   } catch (error) {
     console.error("Error updating project:", error);
+    throw error;
+  }
+};
+
+export const deleteProject = async (projectId) => {
+  try {
+    const currentUser = await getCurrentUser();
+    const projectRef = doc(db, `users/${currentUser.uid}/projects`, projectId);
+    await deleteDoc(projectRef);
+  } catch (error) {
+    console.error("Error deleting project: ", error);
     throw error;
   }
 };
